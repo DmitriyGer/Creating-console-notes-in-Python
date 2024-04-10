@@ -29,7 +29,7 @@ def generat_unique_ID(notes):
 def create_notes(notes):
     title = input("Введите заголовок: ")
     body = input("Введите текст: ")
-    time_set = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+    time_set = datetime.now().strftime("%d-%m-%Y, %H:%M:%S")
     new_note = {
         'id': generat_unique_ID(notes),
         'title': title,
@@ -54,6 +54,38 @@ def view_notes(notes):
         print("Заметки не найдены. Нажмите 1, чтобы создать первую заметку")
 
 
+""" Проверка корректности введеной пользователем даты """
+def correct_date(select_date):
+    try:
+        datetime.strptime(select_date, "%d-%m-%Y")
+        return True
+    except ValueError:
+        return False
+
+
+""" Фильтрация по дате """
+def filter_by_date(notes):
+    select_date = input("Введите дату в формате 'ДД-ММ-ГГГГ': ")
+    while not correct_date(select_date):
+        print("Некорректный формат даты. Повторите попытку")
+        select_date = input("Введите дату в формате 'ДД-ММ-ГГГГ': ")
+    
+    filtered_notes = [note for note in notes if note['time'].split(", ")[0] == select_date]
+
+    if filtered_notes:
+        for note in filtered_notes:
+            print()
+            print("Найденные заметки по дате", select_date, ":\n")
+            print("ID:", note['id'])
+            print("Заголовок:", note['title'])
+            print("Текст:", note['body'])
+            print("Дата создания:", note['time'])
+            print()
+    else:
+        print()
+        print(select_date, "В этот день вы не оставляли заметок")
+
+
 """ Редактирование заметок """
 def edit_notes(notes):
     select_id = int(input("Введите ID заметки, которую хотите изменить: "))
@@ -61,11 +93,11 @@ def edit_notes(notes):
         if note['id'] == select_id:
             note['title'] = input("Введите новый заголовок: ")
             note['body'] = input("Введите новый текст: ")
-            note['time'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            note['time'] = datetime.now().strftime("%d-%m-%Y, %H:%M:%S")
             save_notes(notes, 'notes.json')
             print("Заметка успешно изменена")
-        else:
-            print("ID не найден. Введите корректный ID")
+            return
+    print("ID не найден. Введите корректный ID")
 
 
 """ Удаление заметок """
@@ -89,8 +121,9 @@ def main():
         print("\n0 - Выход")
         print("1 - Создать")
         print("2 - Просмотреть")
-        print("3 - Редактировать")
-        print("4 - Удалить\n")
+        print("3 - Просмотреть с учетом фильтрации по дате")
+        print("4 - Редактировать")
+        print("5 - Удалить\n")
         answer = input("Выберите действие: ")
         print()
 
@@ -104,11 +137,14 @@ def main():
             view_notes(notes)
 
         elif answer == "3":
-            edit_notes(notes)
+            filter_by_date(notes)
 
         elif answer == "4":
-            delete_notes(notes)
+            edit_notes(notes)
 
+        elif answer == "5":
+            delete_notes(notes)
+            
         else:
             print("Неверно введено действие, проверьте написание")
 
