@@ -73,9 +73,9 @@ def filter_by_date(notes):
     filtered_notes = [note for note in notes if note['time'].split(", ")[0] == select_date]
 
     if filtered_notes:
+        print()
+        print("Найденные заметки по дате", select_date, ":\n")
         for note in filtered_notes:
-            print()
-            print("Найденные заметки по дате", select_date, ":\n")
             print("ID:", note['id'])
             print("Заголовок:", note['title'])
             print("Текст:", note['body'])
